@@ -1,5 +1,6 @@
 package com.muc.group14.mediaremotecontroller;
 
+
 import android.net.wifi.WifiManager;
 
 import org.fourthline.cling.UpnpServiceConfiguration;
@@ -13,13 +14,14 @@ import org.fourthline.cling.model.types.UDAServiceType;
  */
 public class MyUpnpServiceImpl extends AndroidUpnpServiceImpl{
 
+    //TODO include WifiManager
     @Override
-    protected UpnpServiceConfiguration createConfiguration(WifiManager wifiManager) {
-        return new AndroidUpnpServiceConfiguration(wifiManager){
+    protected UpnpServiceConfiguration createConfiguration() {
+        return new AndroidUpnpServiceConfiguration(){
             @Override
             public ServiceType[] getExclusiveServiceTypes(){
                 return new ServiceType[]{
-                        new UDAServiceType("SwitchPower")
+                        new UDAServiceType("AVTransport")
                 };
             }
         };

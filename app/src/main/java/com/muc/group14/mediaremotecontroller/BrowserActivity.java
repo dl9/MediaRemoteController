@@ -1,28 +1,32 @@
 package com.muc.group14.mediaremotecontroller;
 
+/**
+ * Created by Teresa H on 04.07.2015.
+ */
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.fourthline.cling.android.AndroidUpnpServiceImpl;
 import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.LocalDevice;
+import org.fourthline.cling.model.meta.RemoteDevice;
+import org.fourthline.cling.registry.DefaultRegistryListener;
+import org.fourthline.cling.registry.Registry;
 
-import java.lang.reflect.Array;
-import java.util.List;
-
-/**
- * Created by David on 30.06.2015.
- */
 public class BrowserActivity extends ListActivity {
 
     private AndroidUpnpService upnpService;
-    private ArrayAdapter listAdapter;
+    private ArrayAdapter<DeviceDisplay> listAdapter;
     private BrowseRegistryListener browseRegistryListener = new BrowseRegistryListener();
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -62,5 +66,85 @@ public class BrowserActivity extends ListActivity {
         }
 
         getApplicationContext().unbindService(serviceConnection);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu){
+        menu.add(0, 0, 0,R.string.searchLAN).setIcon(android.R.drawable.ic_menu_search);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case 0:
+                if(upnpService == null)
+                    break;
+                Toast.makeText(this, R.string.searchingLAN, Toast.LENGTH_SHORT).show();
+                upnpService.getRegistry().removeAllRemoteDevices();
+                upnpService.getControlPoint().search();
+                break;
+        }
+        return false;
+
+    }
+
+    protected class BrowseRegistryListener extends DefaultRegistryListener {
+
+    /*public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
+        deviceAdded(device);
+    }*/
+
+        @Override
+        public void remoteDeviceAdded(Registry registry, RemoteDevice device) {
+            super.remoteDeviceAdded(registry, device);
+        }
+
+        @Override
+        public void remoteDeviceRemoved(Registry registry, RemoteDevice device) {
+            super.remoteDeviceRemoved(registry, device);
+        }
+
+        @Override
+        public void localDeviceAdded(Registry registry, LocalDevice device) {
+            super.localDeviceAdded(registry, device);
+        }
+
+        @Override
+        public void localDeviceRemoved(Registry registry, LocalDevice device) {
+            super.localDeviceRemoved(registry, device);
+        }
+
+        public void deviceAdded(final Device device) {
+            runOnUiThread(new Runnable() {
+                public void run () {
+                    DeviceDisplay d = new DeviceDisplay(device);
+                    int position = listAdapter.getPosition(d);
+                    if(position >= 0) {
+                        listAdapter.remove(d);
+                        listAdapter.insert(d, position);
+                    }
+                    else {
+                        listAdapter.add(d);
+                    }
+                }
+            });
+        }
+
+        public void deviceRemoved(final Device device){
+            runOnUiThread(new Runnable(){
+                public void run(){
+                    listAdapter.remove(new DeviceDisplay(device));
+                }
+            });
+        }
+   /* @Override
+    public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, Exception ex) {
+        ((Activity)this.getContext())runOnUiThread(new Runnable(){
+            public void run(){
+                Toast.makeText(BrowserActivity.this, "Discovery failed of '"+device.getDisplayString()+
+                "': "+ (ex !=null ? ex.toString() : "Couldn't retrieve device/service descriptions"),Toast.LENGTH_LONG).show();
+            }
+        });
+        deviceRemoved(device);
+    }*/
     }
 }

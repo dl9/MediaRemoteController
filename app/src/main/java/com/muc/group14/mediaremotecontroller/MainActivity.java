@@ -35,7 +35,7 @@ public class MainActivity extends ListActivity {
             listAdapter.clear();
             upnpService.getRegistry().addListener(browseRegistryListener);
 
-            Log.d("test", "abc");
+            Log.d("test", "serviceConnected");
             for(Device device: upnpService.getRegistry().getDevices()){
                 browseRegistryListener.deviceAdded(device);
             }

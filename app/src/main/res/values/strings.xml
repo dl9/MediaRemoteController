@@ -14,4 +14,5 @@
     <string name="deviceDetailsNotYetAvailable">Device details are being discovered, please wait.</string>
     <string name="registeringDevice">Registering Device</string>
     <string name="createDeviceFailed"></string>
+    <string name="test">Medium Text</string>
 </resources>
